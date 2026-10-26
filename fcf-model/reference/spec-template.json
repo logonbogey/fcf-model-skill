@@ -1,0 +1,43 @@
+{
+  "_comment": "Input schema for build_fcf_workbook.py. Example Co is a made-up company: every number below is invented, but the lines re-add to reported_ocf so the tie-out passes. Copy this file, swap in a real company's data, and run the builder. Every value is copied straight off the statement of cash flows exactly how the company printed it (uses of cash negative). Set 'fcf': true on any adjustment you decide to subtract from normalized FCF. Set 'is_sbc': true on the stock-based comp line. Working-capital lines are auto-flagged one-time + fcf, so just list them.",
+
+  "_non_us_notes": "For non-US / IFRS filers: (1) set 'units' to the reporting currency, e.g. '(EUR in Millions)', and keep the ENTIRE model (incl. market_cap/enterprise_value) in that currency. (2) If the statement starts from something other than net income (IFRS indirect method usually starts from 'Profit before tax' or 'Operating profit'), put that figure in 'net_income' and add a top-level 'starting_label' string, e.g. \"starting_label\": \"Profit before tax\". The builder uses it for the label; default is 'Net Income'.",
+
+  "company": "Example Co (EXMP)",
+  "units": "($ in Millions)",
+  "years": [2023, 2024, 2025],
+
+  "net_income": [500, 550, 600],
+
+  "adjustments": [
+    {"label": "Depreciation and amortization",
+     "values": {"2023": 200, "2024": 210, "2025": 220},
+     "rationale": "Non-cash; kept added back. Real reinvestment is captured separately through Capital Expenditures."},
+    {"label": "Stock-based compensation", "is_sbc": true, "fcf": true,
+     "values": {"2023": 100, "2024": 110, "2025": 120},
+     "rationale": "Real dilutive cost that GAAP adds back as non-cash. Subtract it."},
+    {"label": "Deferred income taxes",
+     "values": {"2023": 10, "2024": -5, "2025": 8},
+     "rationale": "YOUR CALL. Fill in from your own judgment card."},
+    {"label": "Other",
+     "values": {"2023": 15, "2024": 20, "2025": 25},
+     "rationale": "JUDGMENT CHECKPOINT. Open the footnotes, see what is inside the number, and decide. Not decided in this example."}
+  ],
+
+  "working_capital": [
+    {"label": "Accounts receivable", "values": {"2023": -30, "2024": 20, "2025": -10}},
+    {"label": "Inventories", "values": {"2023": -40, "2024": -25, "2025": 15}},
+    {"label": "Accounts payable and accrued liabilities", "values": {"2023": 35, "2024": -10, "2025": 20}}
+  ],
+
+  "capex": [-180, -190, -200],
+  "capex_rationale": "Purchases of property, plant and equipment.",
+  "reported_ocf": [790, 870, 998],
+
+  "averages": true,
+
+  "_valuation_note": "Optional valuation footer. market_cap: from a live quote (record the date in valuation_date). enterprise_value: market_cap + total debt - cash & equivalents, from the latest balance sheet. With enterprise_value set, the builder emits the full footer (Market Cap, EV, average FCF and yields, last-year FCF yield, NI Delta). Every yield divides by MIN(market cap, EV).",
+  "market_cap": null,
+  "enterprise_value": null,
+  "valuation_date": null
+}
